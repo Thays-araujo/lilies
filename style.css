@@ -1,0 +1,482 @@
+/* =========================================================
+   RECANTO ROXO — casinha, grama roxa e jardim de lírios
+   Paleta: crepúsculo lilás
+   ========================================================= */
+
+:root{
+  /* céu */
+  --sky-top:#1b1035;
+  --sky-mid:#432368;
+  --sky-horizon:#a5619b;
+  --sky-glow:#ffcf9e;
+
+  /* morros */
+  --hill-back:#4a2c6d;
+  --hill-front:#33204e;
+
+  /* grama roxa */
+  --grass-dark:#4d2a78;
+  --grass-mid:#7a3fa8;
+  --grass-light:#a465c9;
+  --grass-tip:#d19fe8;
+
+  /* casa */
+  --wall:#f4e4c9;
+  --wall-shadow:#e0c9a0;
+  --roof:#a8462f;
+  --roof-shadow:#822f1d;
+  --door:#5a3825;
+  --window-glow:#ffd873;
+
+  /* lírios */
+  --lily-petal:#fdf6ff;
+  --lily-petal-shade:#e9c3e8;
+  --lily-center:#f4c430;
+  --lily-stem:#5c7a52;
+
+  /* vento — controlado via JS */
+  --wind-mult:1;
+  --wind-speed:1;
+
+  --font-display:'Fraunces', serif;
+  --font-body:'Quicksand', sans-serif;
+}
+
+*{ box-sizing:border-box; }
+
+html,body{
+  margin:0;
+  padding:0;
+  height:100%;
+  background:var(--sky-top);
+  font-family:var(--font-body);
+  overflow-x:hidden;
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:0.001s !important; animation-iteration-count:1 !important; }
+}
+
+.scene{
+  position:relative;
+  width:100%;
+  height:100vh;
+  min-height:640px;
+  overflow:hidden;
+}
+
+/* ---------------- CÉU ---------------- */
+
+.sky{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,
+    var(--sky-top) 0%,
+    var(--sky-mid) 42%,
+    var(--sky-horizon) 78%,
+    var(--sky-glow) 100%);
+}
+
+.stars{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:60%;
+}
+
+.stars span{
+  position:absolute;
+  width:2px;
+  height:2px;
+  border-radius:50%;
+  background:#fff;
+  animation:twinkle 3.5s ease-in-out infinite;
+}
+
+@keyframes twinkle{
+  0%,100%{ opacity:.25; transform:scale(1); }
+  50%{ opacity:1; transform:scale(1.6); }
+}
+
+.moon{
+  position:absolute;
+  top:8%;
+  right:12%;
+  width:70px;
+  height:70px;
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, #fffdf3, #fef0c9 60%, #f8d67f 100%);
+  box-shadow:0 0 40px 12px rgba(255, 244, 200, 0.35),
+             0 0 90px 30px rgba(255, 220, 150, 0.15);
+}
+
+/* ---------------- MORROS ---------------- */
+
+.hills{
+  position:absolute;
+  bottom:0;
+  left:0;
+  width:100%;
+  height:38%;
+}
+.hills-back{ height:42%; z-index:1; }
+.hills-back path{ fill:var(--hill-back); }
+.hills-front{ height:34%; z-index:2; }
+.hills-front path{ fill:var(--hill-front); }
+
+/* ---------------- CASA ---------------- */
+
+.house{
+  position:absolute;
+  bottom:16%;
+  left:50%;
+  transform:translateX(-50%);
+  width:min(30vw, 300px);
+  height:min(24vw, 240px);
+  z-index:5;
+}
+
+.walls{
+  position:absolute;
+  bottom:0;
+  left:0;
+  width:100%;
+  height:70%;
+  background:linear-gradient(180deg, var(--wall), var(--wall-shadow));
+  border-radius:2px 2px 0 0;
+  box-shadow:0 10px 24px rgba(20,6,35,0.45);
+}
+
+.roof{
+  position:absolute;
+  top:0;
+  left:-8%;
+  width:116%;
+  height:42%;
+  background:var(--roof);
+  clip-path:polygon(50% 0%, 100% 100%, 0% 100%);
+}
+.roof-shadow{
+  position:absolute;
+  top:0;
+  left:-8%;
+  width:116%;
+  height:42%;
+  background:linear-gradient(100deg, transparent 55%, var(--roof-shadow) 100%);
+  clip-path:polygon(50% 0%, 100% 100%, 0% 100%);
+  opacity:.55;
+}
+
+.door{
+  position:absolute;
+  bottom:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:22%;
+  height:55%;
+  background:var(--door);
+  border-radius:6px 6px 0 0;
+}
+.doorknob{
+  position:absolute;
+  top:50%;
+  right:14%;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:var(--window-glow);
+}
+
+.window{
+  position:absolute;
+  bottom:20%;
+  width:20%;
+  height:26%;
+  background:var(--window-glow);
+  border-radius:3px;
+  box-shadow:0 0 16px 4px rgba(255, 216, 115, 0.75),
+             0 0 40px 10px rgba(255, 216, 115, 0.25);
+  display:grid;
+  grid-template-columns:1fr 1fr;
+}
+.window span{ border-right:2px solid var(--wall-shadow); }
+.window span:last-child{ border-right:none; }
+.window-left{ left:12%; }
+.window-right{ right:12%; }
+
+.chimney{
+  position:absolute;
+  top:-14%;
+  right:16%;
+  width:9%;
+  height:26%;
+  background:var(--roof-shadow);
+  z-index:1;
+}
+
+.smoke span{
+  position:absolute;
+  bottom:100%;
+  left:50%;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.55);
+  animation:smoke-rise 4s ease-in infinite;
+}
+
+@keyframes smoke-rise{
+  0%{ transform:translate(-50%,0) scale(0.6); opacity:0.55; }
+  70%{ opacity:.25; }
+  100%{ transform:translate(calc(-50% + 18px), -90px) scale(1.8); opacity:0; }
+}
+
+.porch-light{
+  position:absolute;
+  bottom:8%;
+  left:8%;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:var(--window-glow);
+  box-shadow:0 0 10px 4px rgba(255,216,115,0.8);
+}
+
+/* ---------------- CANTEIRO DE LÍRIOS ---------------- */
+
+.lily-garden{
+  position:absolute;
+  bottom:15%;
+  left:6%;
+  width:min(26vw, 260px);
+  height:16%;
+  z-index:9;
+}
+
+.lily{
+  position:absolute;
+  bottom:0;
+  transform-origin:bottom center;
+  animation-name:sway;
+  animation-timing-function:ease-in-out;
+  animation-iteration-count:infinite;
+  animation-delay:var(--delay, 0s);
+  animation-duration:calc(var(--base-duration, 3s) / var(--wind-speed));
+}
+
+.lily-stem{
+  position:absolute;
+  bottom:0;
+  left:50%;
+  width:2px;
+  transform:translateX(-50%);
+  background:var(--lily-stem);
+  border-radius:2px;
+}
+
+.lily-bloom{
+  position:absolute;
+  bottom:100%;
+  left:50%;
+  transform:translate(-50%, 40%);
+}
+
+.petal{
+  position:absolute;
+  width:11px;
+  height:19px;
+  background:linear-gradient(180deg, var(--lily-petal), var(--lily-petal-shade));
+  border-radius:60% 60% 4px 4px;
+  top:0;
+  left:0;
+  transform-origin:bottom center;
+  box-shadow:0 0 6px rgba(253, 246, 255, 0.35);
+}
+.petal:nth-child(1){ transform:translateX(-50%) rotate(0deg); }
+.petal:nth-child(2){ transform:translateX(-50%) rotate(72deg); }
+.petal:nth-child(3){ transform:translateX(-50%) rotate(144deg); }
+.petal:nth-child(4){ transform:translateX(-50%) rotate(216deg); }
+.petal:nth-child(5){ transform:translateX(-50%) rotate(288deg); }
+
+.lily-bud-center{
+  position:absolute;
+  top:2px;
+  left:50%;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:var(--lily-center);
+  transform:translateX(-50%);
+  box-shadow:0 0 6px rgba(244,196,48,0.7);
+}
+
+/* ---------------- VAGALUMES ---------------- */
+
+.fireflies{
+  position:absolute;
+  inset:0;
+  z-index:6;
+  pointer-events:none;
+}
+.firefly{
+  position:absolute;
+  width:4px;
+  height:4px;
+  border-radius:50%;
+  background:#fff2b0;
+  box-shadow:0 0 8px 3px rgba(255,242,176,0.8);
+  animation:firefly-float 6s ease-in-out infinite;
+}
+@keyframes firefly-float{
+  0%,100%{ transform:translate(0,0); opacity:.2; }
+  25%{ transform:translate(14px,-18px); opacity:1; }
+  50%{ transform:translate(-6px,-30px); opacity:.5; }
+  75%{ transform:translate(-18px,-10px); opacity:1; }
+}
+
+/* ---------------- GRAMA ROXA ---------------- */
+
+.grass-field{
+  position:absolute;
+  bottom:0;
+  left:0;
+  width:100%;
+  height:26%;
+  z-index:7;
+  background:linear-gradient(180deg, transparent 0%, var(--grass-dark) 60%);
+}
+
+.blade{
+  position:absolute;
+  bottom:0;
+  width:6px;
+  border-radius:4px 4px 0 0;
+  transform-origin:bottom center;
+  animation-name:sway;
+  animation-timing-function:ease-in-out;
+  animation-iteration-count:infinite;
+  animation-delay:var(--delay, 0s);
+  animation-duration:calc(var(--base-duration, 2.4s) / var(--wind-speed));
+}
+
+@keyframes sway{
+  0%,100%{
+    transform:rotate(calc(var(--sway-angle) * -1deg * var(--wind-mult)));
+  }
+  50%{
+    transform:rotate(calc(var(--sway-angle) * 1deg * var(--wind-mult)));
+  }
+}
+
+/* the animation-duration itself reacts to wind speed via inline var, see script.js */
+
+/* ---------------- TÍTULO ---------------- */
+
+.title-card{
+  position:absolute;
+  top:6%;
+  left:50%;
+  transform:translateX(-50%);
+  text-align:center;
+  z-index:10;
+  color:#fdf6ff;
+  text-shadow:0 2px 18px rgba(20,6,35,0.6);
+  pointer-events:none;
+}
+
+.eyebrow{
+  margin:0 0 4px;
+  font-family:var(--font-body);
+  font-size:0.72rem;
+  letter-spacing:0.32em;
+  text-transform:uppercase;
+  color:#d8b8e8;
+}
+
+.title-card h1{
+  margin:0;
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:clamp(2.2rem, 6vw, 3.6rem);
+  letter-spacing:0.01em;
+}
+
+.subtitle{
+  margin:8px 0 0;
+  font-family:var(--font-display);
+  font-style:italic;
+  font-weight:500;
+  font-size:clamp(0.85rem, 1.6vw, 1.05rem);
+  color:#e8d3f0;
+}
+
+/* ---------------- CONTROLE DE VENTO ---------------- */
+
+.wind-control{
+  position:absolute;
+  bottom:4%;
+  right:4%;
+  z-index:12;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:rgba(27, 16, 53, 0.55);
+  backdrop-filter:blur(6px);
+  border:1px solid rgba(255,255,255,0.12);
+  padding:8px 12px;
+  border-radius:999px;
+  font-family:var(--font-body);
+}
+
+.wind-label{
+  font-size:0.8rem;
+  color:#f0e2fa;
+  letter-spacing:0.02em;
+}
+
+.wind-buttons{
+  display:flex;
+  gap:6px;
+}
+
+.wind-buttons button{
+  border:none;
+  background:transparent;
+  color:#d8b8e8;
+  font-family:var(--font-body);
+  font-weight:600;
+  font-size:0.75rem;
+  padding:6px 12px;
+  border-radius:999px;
+  cursor:pointer;
+  transition:background 0.2s, color 0.2s;
+}
+
+.wind-buttons button:hover{
+  background:rgba(255,255,255,0.08);
+}
+
+.wind-buttons button.active{
+  background:var(--grass-tip);
+  color:#2a1440;
+}
+
+.wind-buttons button:focus-visible,
+.wind-control:focus-visible{
+  outline:2px solid #fff;
+  outline-offset:2px;
+}
+
+/* ---------------- RESPONSIVO ---------------- */
+
+@media (max-width:720px){
+  .house{ width:44vw; height:35vw; bottom:18%; }
+  .lily-garden{ width:44vw; left:4%; bottom:14%; }
+  .grass-field{ height:22%; }
+  .title-card{ top:5%; }
+  .wind-control{
+    right:50%;
+    transform:translateX(50%);
+    bottom:3%;
+  }
+}
